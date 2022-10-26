@@ -4,11 +4,13 @@
 
 ## Installation
 
-Install Loopback4BpmnServerComponent using `npm`;
+Install Loopback4BpmnServerComponent using local package
 
-```sh
-$ [npm install | yarn add] loopback4-bpmn-server
-```
+In the package.json add:
+
+    "loopback4-tenant-table-filter": "file:loopback4-tenant-table-filter-1.0.5.tgz",
+    "bpmn-server": "file:bpmn-server-1.3.12.tgz",
+    "loopback4-bpmn-server": "file:loopback4-bpmn-server-0.96.1.tgz",
 
 ## Basic Use
 
@@ -16,15 +18,24 @@ Configure and load Loopback4BpmnServerComponent in the application constructor
 as shown below.
 
 ```ts
-import {Loopback4BpmnServerComponent, Loopback4BpmnServerComponentOptions, DEFAULT_LOOPBACK4_BPMN_SERVER_OPTIONS} from 'loopback4-bpmn-server';
+import {Loopback4BpmnServerComponent, Loopback4BpmnServerComponentBindings, Loopback4BpmnServerComponentOptions} from 'loopback4-bpmn-server';
 // ...
 export class MyApplication extends BootMixin(ServiceMixin(RepositoryMixin(RestApplication))) {
   constructor(options: ApplicationConfig = {}) {
-    const opts: Loopback4BpmnServerComponentOptions = DEFAULT_LOOPBACK4_BPMN_SERVER_OPTIONS;
-    this.configure(Loopback4BpmnServerComponentBindings.COMPONENT).to(opts);
-      // Put the configuration options here
-    });
+  
+  
+    //--------------------------------------------------------------------------
+    // BpmnServerComponent
+    //--------------------------------------------------------------------------
+    const definitionsPath = path.join(__dirname, '../processes/')
+    console.log('AppServerApplication:startup: bpmnProcessDefinitionDirectory=', definitionsPath);
+    const componentOptions: Loopback4BpmnServerComponentOptions = {
+      bpmnProcessDefinitionDirectory: definitionsPath
+    }
+    this.configure(Loopback4BpmnServerComponentBindings.COMPONENT).to(componentOptions);
     this.component(Loopback4BpmnServerComponent);
+
+
     // ...
   }
   // ...
