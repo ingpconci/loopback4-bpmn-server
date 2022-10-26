@@ -3,7 +3,7 @@
 */
 export interface Loopback4BpmnServerComponentOptions {
   // Add the definitions here
-
+  bpmnProcessDefinitionDirectory: string;
 }
 
 /**
@@ -11,5 +11,5 @@ export interface Loopback4BpmnServerComponentOptions {
 */
 export const DEFAULT_LOOPBACK4_BPMN_SERVER_OPTIONS: Loopback4BpmnServerComponentOptions = {
   // Specify the values here
-
+  bpmnProcessDefinitionDirectory: ''
 };
