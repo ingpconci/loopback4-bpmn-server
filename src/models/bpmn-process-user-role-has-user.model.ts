@@ -1,4 +1,4 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {BpmnProcessUserRole} from './bpmn-process-user-role.model';
 import {User} from './user.model';
 
@@ -54,6 +54,14 @@ export class BpmnProcessUserRoleHasUser extends Entity {
     postgresql: {columnName: 'tenantId', dataType: 'integer', dataLength: null, dataPrecision: null, dataScale: 0, nullable: 'YES'},
   })
   tenantId: number;
+
+  //assignedUserFilterValueNumber
+  @property({
+    type: 'number',
+    jsonSchema: {nullable: true},
+    postgresql: {columnName: 'assignedUserFilterValueNumber', dataType: 'integer', dataLength: null, dataPrecision: null, dataScale: 0, nullable: 'YES'},
+  })
+  assignedUserFilterValueNumber?: number;
 
 
   // Define well-known properties here

@@ -1,8 +1,8 @@
-import {inject, Getter} from '@loopback/core';
-import {DefaultCrudRepository, repository, BelongsToAccessor} from '@loopback/repository';
-import { TenantTableFilterRepository } from 'loopback4-tenant-table-filter';
+import {Getter, inject} from '@loopback/core';
+import {BelongsToAccessor, repository} from '@loopback/repository';
+import {TenantTableFilterRepository} from 'loopback4-tenant-table-filter';
 import {BpmnServerDataSource} from '../datasources';
-import {BpmnProcessUserRoleHasUser, BpmnProcessUserRoleHasUserRelations, BpmnProcessUserRole, User} from '../models';
+import {BpmnProcessUserRole, BpmnProcessUserRoleHasUser, BpmnProcessUserRoleHasUserRelations, User} from '../models';
 import {BpmnProcessUserRoleRepository} from './bpmn-process-user-role.repository';
 import {UserRepository} from './user.repository';
 
@@ -17,8 +17,8 @@ export class BpmnProcessUserRoleHasUserRepository extends TenantTableFilterRepos
   public readonly user: BelongsToAccessor<User, typeof BpmnProcessUserRoleHasUser.prototype.id>;
 
   constructor(
-    @inject('datasources.db') dataSource:BpmnServerDataSource, 
-    @repository.getter('BpmnProcessUserRoleRepository') protected bpmnProcessUserRoleRepositoryGetter: Getter<BpmnProcessUserRoleRepository>, 
+    @inject('datasources.db') dataSource: BpmnServerDataSource,
+    @repository.getter('BpmnProcessUserRoleRepository') protected bpmnProcessUserRoleRepositoryGetter: Getter<BpmnProcessUserRoleRepository>,
     @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>,
   ) {
     super(BpmnProcessUserRoleHasUser, dataSource);

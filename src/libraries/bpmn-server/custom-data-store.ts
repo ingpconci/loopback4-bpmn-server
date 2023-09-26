@@ -1,3 +1,4 @@
+import {Filter} from '@loopback/repository';
 import {Assignment, Authorization, Execution, IBPMNServer, IDataStore, IInstanceData, Involvement, Notification, ServerComponent} from 'bpmn-server/dist/index';
 import {BpmnProcessInstance} from '../../models';
 
@@ -141,7 +142,7 @@ class CustomDataStore extends ServerComponent implements IDataStore {
   private async saveInstance(instance, items) {
     //		this.logger.log("Saving...");
     console.log('CustomDataStore.saveInstance:');
-    debug('saveInstance: instance=', instance);
+    debug('saveInstance: instance.name=', instance.name);
 
     this.logger.log("Datastore.saveInstance: Saving...");
     this.logger.log("		instance=", instance);
@@ -336,14 +337,75 @@ class CustomDataStore extends ServerComponent implements IDataStore {
     */
     const records: any = [];
     //--------------------------------------------------------------------------
+    // query
+    //--------------------------------------------------------------------------
+    let filterWhere: any;
+    filterWhere = {
+      and: []
+    };
+
+    //id
+    const instanceId = query['id'];
+    debug('findInstances: query instanceId=', instanceId);
+    if (filterWhere && filterWhere.and && instanceId) {
+      filterWhere.and.push(
+        {
+          id: {
+            eq: instanceId
+          }
+        },
+      )
+    }
+    //status
+    const instanceStatus = query['status'];
+    debug('findInstances: query instanceStatus=', instanceStatus);
+    if (filterWhere && filterWhere.and && instanceStatus) {
+      filterWhere.and.push(
+        {
+          status: {
+            eq: instanceStatus
+          }
+        },
+      )
+    }
+    const filterBpmnProcessInstance: Filter<BpmnProcessInstance> = {
+      where: filterWhere
+    }
+
+    // fields
+    const fields = {
+      id: true,
+      parentItemIs: true,
+      name: true,
+      status: true,
+      startedAt: true,
+      endedAt: true,
+      saved: true,  //N.B. not savedAt
+      source: true,
+      items: true,
+      data: true,
+      tokens: true,
+      loops: true,
+      logs: true,
+      counter: true,
+      tenantIs: true,
+      note: true
+    };
+    filterBpmnProcessInstance.fields = fields;
+
+    // order
+    filterBpmnProcessInstance.order = ['startedAt asc'];
+
+    debug('findInstances: filterBpmnProcessInstance=', JSON.stringify(filterBpmnProcessInstance));
+
+    //--------------------------------------------------------------------------
     // Find bpmnProcessInstances
     //--------------------------------------------------------------------------
     let bpmnProcessInstanceArray = undefined;
-    const instanceId = query['id'];
-    debug('findInstances: instanceId=', instanceId);
+
     try {
       debug('findInstances: get the instances from the DB.....');
-      bpmnProcessInstanceArray = await this.server.configuration.database.loopbackRepositories.bpmnProcessInstanceRepository.findNoTenantIdFilter();
+      bpmnProcessInstanceArray = await this.server.configuration.database.loopbackRepositories.bpmnProcessInstanceRepository.findNoTenantIdFilter(filterBpmnProcessInstance);
       debug('findInstances: bpmnProcessInstanceArray.lenght=', bpmnProcessInstanceArray.length);
 
       // eslint-disable-next-line @typescript-eslint/prefer-for-of
@@ -407,7 +469,7 @@ class CustomDataStore extends ServerComponent implements IDataStore {
 
         const bpmnProcessInstance = bpmnProcessInstanceArray[index];
         debug('findInstances: bpmnProcessInstance.id=', bpmnProcessInstance.id);
-        if (bpmnProcessInstance.id === instanceId) {
+        if (instanceId !== undefined && bpmnProcessInstance.id === instanceId) {
           //------------------------------------------------
           // normalize logs
           //------------------------------------------------
@@ -424,6 +486,9 @@ class CustomDataStore extends ServerComponent implements IDataStore {
             }
           }
           bpmnProcessInstance.logs = logsTextArray;
+          records.push(bpmnProcessInstance);
+        }
+        else {
           records.push(bpmnProcessInstance);
         }
       }

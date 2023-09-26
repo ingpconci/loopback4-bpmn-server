@@ -7,12 +7,12 @@ import {
   inject, injectable
 } from '@loopback/core';
 import {BPMNServer} from 'bpmn-server';
-import {BpmnProcessInstanceController, BpmnProcessModelController, BpmnProcessUserRoleController, BpmnProcessUserRoleHasBpmnProcessModelController, BpmnProcessUserRoleHasUserController} from './controllers';
+import {BpmnProcessInstanceController, BpmnProcessInstanceHasUserTaskController, BpmnProcessModelController, BpmnProcessUserRoleController, BpmnProcessUserRoleGroupController, BpmnProcessUserRoleHasBpmnProcessModelController, BpmnProcessUserRoleHasUserController} from './controllers';
 import {Loopback4BpmnServerComponentBindings} from './keys';
 import {configuration} from './libraries/bpmn-server/configuration';
-import {BpmnProcessInstance, BpmnProcessModel, BpmnProcessUserRole, BpmnProcessUserRoleHasBpmnProcessModel, BpmnProcessUserRoleHasUser} from './models';
+import {BpmnProcessInstance, BpmnProcessInstanceHasUserTask, BpmnProcessModel, BpmnProcessUserRole, BpmnProcessUserRoleGroup, BpmnProcessUserRoleHasBpmnProcessModel, BpmnProcessUserRoleHasUser} from './models';
 import {BpmnServerObserver} from './observers';
-import {BpmnProcessInstanceRepository, BpmnProcessModelRepository, BpmnProcessUserRoleHasBpmnProcessModelRepository, BpmnProcessUserRoleHasUserRepository, BpmnProcessUserRoleRepository} from './repositories';
+import {BpmnProcessInstanceHasUserTaskRepository, BpmnProcessInstanceRepository, BpmnProcessModelRepository, BpmnProcessUserRoleGroupRepository, BpmnProcessUserRoleHasBpmnProcessModelRepository, BpmnProcessUserRoleHasUserRepository, BpmnProcessUserRoleRepository} from './repositories';
 import {BpmnServerEngineService} from './services';
 import {DEFAULT_LOOPBACK4_BPMN_SERVER_OPTIONS, Loopback4BpmnServerComponentOptions} from './types';
 const debug = require('debug')('loopback:bpmn-server');
@@ -69,7 +69,9 @@ export class Loopback4BpmnServerComponent implements Component {
     BpmnProcessModelRepository,
     BpmnProcessUserRoleRepository,
     BpmnProcessUserRoleHasUserRepository,
-    BpmnProcessUserRoleHasBpmnProcessModelRepository
+    BpmnProcessUserRoleHasBpmnProcessModelRepository,
+    BpmnProcessUserRoleGroupRepository,
+    BpmnProcessInstanceHasUserTaskRepository
   ];
 
   /*
@@ -80,7 +82,9 @@ export class Loopback4BpmnServerComponent implements Component {
     BpmnProcessModel,
     BpmnProcessUserRole,
     BpmnProcessUserRoleHasUser,
-    BpmnProcessUserRoleHasBpmnProcessModel
+    BpmnProcessUserRoleHasBpmnProcessModel,
+    BpmnProcessUserRoleGroup,
+    BpmnProcessInstanceHasUserTask
   ];
 
   /*
@@ -91,7 +95,9 @@ export class Loopback4BpmnServerComponent implements Component {
     BpmnProcessModelController,
     BpmnProcessUserRoleController,
     BpmnProcessUserRoleHasUserController,
-    BpmnProcessUserRoleHasBpmnProcessModelController
+    BpmnProcessUserRoleHasBpmnProcessModelController,
+    BpmnProcessUserRoleGroupController,
+    BpmnProcessInstanceHasUserTaskController
   ];
 
   static getVersion() {

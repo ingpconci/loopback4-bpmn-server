@@ -4,3 +4,7 @@ export * from './bpmn-process-user-role.model';
 export * from './bpmn-process-user-role-has-user.model';
 export * from './user.model';
 export * from './bpmn-process-user-role-has-bpmn-process-model.model';
+export * from './bpmn-process-user-role-group.model';
+export * from './bpmn-process-instance-has-user-task.model';
+export * from './bpmn-process-user-task.model';
+export * from './bpmn-process-instance-item.model';

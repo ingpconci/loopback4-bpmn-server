@@ -144,6 +144,12 @@ export class BpmnProcessInstance extends Entity {
   })
   tenantId: number;
 
+  @property({
+    type: 'string',
+    jsonSchema: {nullable: true},
+    postgresql: {columnName: 'note', dataType: 'text', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'YES'},
+  })
+  note?: string;
 
 
   constructor(data?: Partial<BpmnProcessInstance>) {

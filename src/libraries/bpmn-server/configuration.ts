@@ -6,7 +6,7 @@ import {CustomModelsDatastore} from './custom-model-data-store';
 
 //const dotenv = require('dotenv');
 //const res = dotenv.config();
-
+const debug = require('debug')('loopback:bpmn-server:configuration');
 
 const definitionsPath = __dirname + '/processes/';
 const templatesPath = __dirname + '/emailTemplates/';
@@ -35,6 +35,7 @@ const configuration = new Configuration(
 			new Logger({toConsole: false, toFile: '', callback: null});
 		},
 		definitions: function (server: BPMNServer) {
+			debug('Configuration.definitions: get the CustomModelsDatastore');
 			return new CustomModelsDatastore(server);
 		},
 		appDelegate: function (server: any) {
