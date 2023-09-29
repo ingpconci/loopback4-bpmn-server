@@ -1,4 +1,4 @@
-import {DefaultAppDelegate, IExecution, Item} from 'bpmn-server/dist/index';
+import {DefaultAppDelegate, IExecution, Item} from 'bpmn-server/index';
 const debug = require('debug')('loopback:bpmn-server:app-delegate');
 
 const fs = require('fs');
@@ -55,7 +55,7 @@ class MyAppDelegate extends DefaultAppDelegate {
         if (context.item) {
 
             //            console.log(`----->Event: '${event}' for ${context.item.element.type} '${context.item.element.id}' id: ${context.item.id}`);
-            if (event === 'wait' && context.item.element.type == 'bpmn:UserTask')
+            if (event === 'wait' && context.item.element.type === 'bpmn:UserTask')
                 console.log(`----->Waiting for User Input for '${context.item.element.id}' id: ${context.item.id}`);
         }
         //       else
@@ -186,6 +186,111 @@ class MyServices {
         console.log('appDelegate service1 is now complete input:', input, 'output:', seq);
         return {seq, text: 'test'};
     }
+
+
+    async startSeparateProcess(input, context) {
+        console.log('MyAppDelegate.startSeparateProcess: Starting...');
+        //debug('MyAppDelegate.startSeparateProcess: Starting...');
+        // { processName: 'fbk-sd-mnf_NC-azioni-correttive_rev1' }
+        console.log('MyAppDelegate.startSeparateProcess: input=', input);
+        //console.log('MyAppDelegate.startSeparateProcess: context=', context);
+        const item = context.item;
+        /*
+        item: Item {
+            _endedAt: null,
+            assignments: [],
+            authorizations: [],
+            notifications: [],
+            input: { processName: 'fbk-sd-mnf_NC-azioni-correttive_rev1' },
+            output: {},
+            vars: {},
+            _dbAction: 'add',
+            id: 'b083614f-c514-4b6f-86b2-1294c3cf6b68',
+            seq: 4,
+            element: ServiceTask {
+              behaviours: [Map],
+              isFlow: false,
+              scripts: Map(0) {},
+              id: 'Activity_serviceTask',
+              process: [Process],
+              type: 'bpmn:ServiceTask',
+              def: [Base],
+              inbounds: [Array],
+              outbounds: [Array],
+              name: 'startSeparateProcessService',
+              attachments: []
+            },
+            token: Token {
+              execution: [Circular *2],
+              type: 'Primary',
+              dataPath: '',
+              startNodeId: 'StartEvent_1',
+              currentNode: [ServiceTask],
+              parentToken: null,
+              originItem: null,
+              id: 0,
+              processId: 'Process_0uzd73d',
+              path: [Array],
+              loop: null,
+              status: 'wait'
+            },
+            _status: 'start',
+            startedAt: '2023-09-27T18:40:51.441Z'
+          },
+        */
+        console.log('MyAppDelegate.startSeparateProcess: context.item=', item);
+
+        const currentContextInstanceData = context.instance.data;
+        console.log('MyAppDelegate.startSeparateProcess: currentContextInstanceData=', currentContextInstanceData);
+        // data: { tenantId: 1, startProcessUserId: 10 },
+
+        //----------------------------------------------------------------------------------
+        // Start Process
+        //----------------------------------------------------------------------------------
+        const newProcessInputData = {
+            tenantId: currentContextInstanceData.tenantId,
+            startProcessUserId: currentContextInstanceData.startProcessUserId
+        }
+
+        /*
+        Object.keys(this.mainFormGroup.controls).forEach(key => {
+            const formControl = this.mainFormGroup.controls[key];
+            let value: any = formControl.value;
+            controlsValue[key] = value;
+          });
+          */
+
+        Object.entries(input).forEach(([key, value]) => {
+            if (key !== 'processName') {
+                console.log('MyAppDelegate.startSeparateProcess: input properties key=', key, ' value', value);
+                newProcessInputData[key] = value;
+            }
+        }
+        );
+        console.log('MyAppDelegate.startSeparateProcess: newProcessInputData=', newProcessInputData);
+
+
+        const processName = input.processName;
+        const startEngineResult = await context.engine.start(processName, newProcessInputData);
+        //console.log('MyAppDelegate.startSeparateProcess: startEngineResult=', startEngineResult);
+
+        const newStartedProcessInstance = startEngineResult.instance;
+        //console.log('MyAppDelegate.startSeparateProcess: processInstance=', processInstance);
+        console.log('MyAppDelegate.startSeparateProcess: started process name=', newStartedProcessInstance.name, ' id=', newStartedProcessInstance.id);
+        //console.log('MyAppDelegate.startSeparateProcess: started process items=', newStartedProcessInstance.items);
+        //console.log('MyAppDelegate.startSeparateProcess: started process tokens=', newStartedProcessInstance.tokens);
+
+
+
+
+        const resultService = {
+            startedProcessInstanceId: newStartedProcessInstance.id,
+            startedProcessInstanceName: newStartedProcessInstance.name
+        }
+        console.log('MyAppDelegate.startSeparateProcess: resultService=', resultService);
+        return resultService;
+    }
+
 }
 export {MyAppDelegate};
 

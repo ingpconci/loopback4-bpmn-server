@@ -1,4 +1,4 @@
-import {BpmnModelData, BPMNServer, Definition, IBpmnModelData, IEventData, IModelsDatastore, MongoDB, ServerComponent} from 'bpmn-server/dist/index';
+import {BpmnModelData, BPMNServer, Definition, IBpmnModelData, IEventData, IModelsDatastore, MongoDB, ServerComponent} from 'bpmn-server/index';
 import {BpmnProcessModel} from '../../models';
 
 const fs = require('fs');
@@ -460,8 +460,7 @@ class CustomModelsDatastoreDB extends ServerComponent implements IModelsDatastor
 
 }
 
-export {CustomModelsDatastoreDB};
-export {CustomModelsDatastore};
+export {CustomModelsDatastore, CustomModelsDatastoreDB};
 
 
 class CustomModelsDatastore extends CustomModelsDatastoreDB implements IModelsDatastore {

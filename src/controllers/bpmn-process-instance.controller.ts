@@ -106,20 +106,20 @@ export class BpmnProcessInstanceController {
       },
     })
     theStartNewProcessInput: StartNewProcessInput,
-  ): Promise<{requestResultMessage: string}> {
+  ): Promise<{processInstanceId: string}> {
     console.log('BpmnProcessInstanceController:POST /bpmn-process-instances/start-process:  theStartNewProcessInput=', theStartNewProcessInput);
     debug('POST /bpmn-process-instances/start-process: theStartNewProcessInput=', theStartNewProcessInput);
     const inputData = theStartNewProcessInput.dataJson;//{ name1: 'value1' }
     const processName = theStartNewProcessInput.processName;
 
+    // call service
     const resultStartProcess = await this.bpmnEngineService.startProcess(processName, inputData);
-    console.log('BpmnProcessInstanceController:POST /bpmn-process-instances/start-process:  resultStartProcess=', resultStartProcess);
+
     if (!resultStartProcess) {
       throw new HttpErrors.InternalServerError('Error starting new Process of ' + processName);
     }
-    return {
-      requestResultMessage: 'Successfully start a new process instance of ' + processName
-    };
+    console.log('BpmnProcessInstanceController:POST /bpmn-process-instances/start-process:  resultStartProcess=', resultStartProcess);
+    return resultStartProcess;
   }
 
 
@@ -747,7 +747,7 @@ export class BpmnProcessInstanceController {
 
 
   @authorize({
-    allowedRoles: [RoleKeys.ADMINISTRATOR, RoleKeys.OPERATOR]
+    allowedRoles: [RoleKeys.ADMINISTRATOR, RoleKeys.SUPERUSER, RoleKeys.OPERATOR, RoleKeys.MAINTAINER]
   })
   @get('/bpmn-process-instances/count')
   @response(200, {
@@ -761,7 +761,7 @@ export class BpmnProcessInstanceController {
   }
 
   @authorize({
-    allowedRoles: [RoleKeys.ADMINISTRATOR, RoleKeys.OPERATOR]
+    allowedRoles: [RoleKeys.ADMINISTRATOR, RoleKeys.SUPERUSER, RoleKeys.OPERATOR, RoleKeys.MAINTAINER]
   })
   @get('/bpmn-process-instances')
   @response(200, {

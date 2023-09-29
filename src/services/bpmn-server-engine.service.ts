@@ -1,6 +1,6 @@
 import { /* inject, */ BindingScope, ContextTags, inject, injectable} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {Behaviour_names, BPMNServer, Logger} from 'bpmn-server/dist/index';
+import {BPMNServer, Behaviour_names, Logger} from 'bpmn-server/index';
 import {Loopback4BpmnServerComponent} from '../component';
 import {Loopback4BpmnServerComponentBindings} from '../keys';
 import {configuration} from '../libraries/bpmn-server/configuration';
@@ -217,17 +217,31 @@ export class BpmnServerEngineService {
   //==========================================================================================================================================
   // startProcess
   //==========================================================================================================================================
-  async startProcess(processName: string, inputData: any): Promise<boolean> {
+  async startProcess(processName: string, inputData: any): Promise<{
+    processInstanceId: string
+  }> {
     debug('BpmnEngineService.startProcess: Start');
 
     //----------------------------------------------------------------------------------
-    // Start Engine
+    // Start Process
     //----------------------------------------------------------------------------------
     const startEngineResult = await this.bpmnServer.engine.start(processName, inputData);
     //console.log('BpmnEngineService.startProcess: startEngineResult=', startEngineResult);
 
     const processInstance = startEngineResult.instance;
-    console.log('BpmnEngineService.startProcess: processInstance=', processInstance);
+    //console.log('BpmnEngineService.startProcess: processInstance=', processInstance);
+    console.log('BpmnEngineService.startProcess: process started, name=', processInstance.name, ' id=', processInstance.id);
+    console.log('BpmnEngineService.startProcess: items=', processInstance.items);
+    console.log('BpmnEngineService.startProcess: tokens=', processInstance.tokens);
+
+    const items = processInstance.items.filter(item => {
+      return (item.status === 'wait');
+    });
+    items.forEach(item => {
+      //console.log(`  waiting for <${item.name}> -<${item.elementId}> id: <${item.id}> `);
+      console.log('BpmnEngineService.startProcess: waiting item: name=', item.name, ' elementId=', item.elementId, ' id=', item.id);
+    });
+
     /*
     startEngineResult= <ref *2> Execution {
       server: <ref *1> BPMNServer {
@@ -299,7 +313,76 @@ export class BpmnServerEngineService {
       promises: [],
       uids: { token: 1, item: 3 },
       instance: InstanceObject {
-        items: [ [Object], [Object], [Object] ],
+        items: [
+            {
+              id: 'f93876ec-7608-4af1-a931-b0a68a2a5326',
+              seq: 0,
+              itemKey: undefined,
+              tokenId: 0,
+              elementId: 'StartEvent_1',
+              name: undefined,
+              status: 'end',
+              userId: undefined,
+              startedAt: '2023-09-27T09:12:30.985Z',
+              endedAt: '2023-09-27T09:12:31.013Z',
+              type: 'bpmn:StartEvent',
+              timeDue: undefined,
+              data: null,
+              vars: {},
+              instanceId: undefined,
+              messageId: undefined,
+              signalId: undefined,
+              assignments: [],
+              authorizations: [],
+              notifications: []
+            },
+            {
+              id: '73da7c9e-7c85-4c0a-a6a6-4bc777ed46e8',
+              seq: 1,
+              itemKey: undefined,
+              tokenId: 0,
+              elementId: 'Flow_0snq4em',
+              name: undefined,
+              status: 'end',
+              userId: undefined,
+              startedAt: undefined,
+              endedAt: null,
+              type: 'bpmn:SequenceFlow',
+              timeDue: undefined,
+              data: null,
+              vars: {},
+              instanceId: undefined,
+              messageId: undefined,
+              signalId: undefined,
+              assignments: [],
+              authorizations: [],
+              notifications: []
+            },
+            {
+              id: '511e4ad7-650c-4e44-83a3-10d2e504de2c',
+              seq: 2,
+              itemKey: undefined,
+              tokenId: 0,
+              elementId: 'Activity_1jg0x3o',
+              name: '(1.1) Scelta Categoria',
+              status: 'wait',
+              userId: undefined,
+              startedAt: '2023-09-27T09:12:31.015Z',
+              endedAt: null,
+              type: 'bpmn:UserTask',
+              timeDue: undefined,
+              data: null,
+              vars: {},
+              instanceId: undefined,
+              messageId: undefined,
+              signalId: undefined,
+              assignments: [],
+              authorizations: [],
+              notifications: []
+            }
+          ],
+
+
         logs: [
           'ACTION:execute:',
           '..starting at :StartEvent_1',
@@ -628,8 +711,10 @@ export class BpmnServerEngineService {
     }
     */
 
+    /// https://github.com/ralphhanna/bpmn-server/blob/master/docs/examples.md#invoking-proccess-through-api
+    // get waiting task
     const processDefinition = startEngineResult.definition;
-    console.log('BpmnEngineService.startProcess: processDefinition=', processDefinition);
+    //console.log('BpmnEngineService.startProcess: processDefinition=', processDefinition);
 
     const populateTableUserTasks = false;
     if (populateTableUserTasks) {
@@ -849,7 +934,10 @@ export class BpmnServerEngineService {
 
 
     debug('BpmnEngineService.startProcess: End');
-    return true;
+    const resultStartProcess = {
+      processInstanceId: processInstance ? processInstance.id : null
+    }
+    return resultStartProcess;
   }
 
   //==========================================================================================================================================

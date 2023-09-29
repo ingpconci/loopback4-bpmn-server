@@ -1,5 +1,5 @@
 import {Filter} from '@loopback/repository';
-import {Assignment, Authorization, Execution, IBPMNServer, IDataStore, IInstanceData, Involvement, Notification, ServerComponent} from 'bpmn-server/dist/index';
+import {Assignment, Authorization, Execution, IBPMNServer, IDataStore, IInstanceData, Involvement, Notification, ServerComponent} from 'bpmn-server/index';
 import {BpmnProcessInstance} from '../../models';
 
 const debug = require('debug')('loopback:bpmn-server:custom-data-store');
@@ -347,7 +347,7 @@ class CustomDataStore extends ServerComponent implements IDataStore {
     //id
     const instanceId = query['id'];
     debug('findInstances: query instanceId=', instanceId);
-    if (filterWhere && filterWhere.and && instanceId) {
+    if (filterWhere?.and && instanceId) {
       filterWhere.and.push(
         {
           id: {
@@ -359,7 +359,7 @@ class CustomDataStore extends ServerComponent implements IDataStore {
     //status
     const instanceStatus = query['status'];
     debug('findInstances: query instanceStatus=', instanceStatus);
-    if (filterWhere && filterWhere.and && instanceStatus) {
+    if (filterWhere?.and && instanceStatus) {
       filterWhere.and.push(
         {
           status: {
@@ -480,7 +480,7 @@ class CustomDataStore extends ServerComponent implements IDataStore {
             if (logRowObj.msg) {
               const logRowText = logRowObj.msg;
               logsTextArray.push(logRowText);
-            } else if (logRowObj.msg && logRowObj.msg.msg) {
+            } else if (logRowObj.msg?.msg) {
               const logRowText = logRowObj.msg.msg;
               logsTextArray.push(logRowText);
             }

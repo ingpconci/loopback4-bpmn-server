@@ -1,5 +1,5 @@
 
-import {ACL, BPMNServer, Configuration, IAM, Logger} from 'bpmn-server/dist/index';
+import {ACL, BPMNServer, Configuration, IAM, Logger} from 'bpmn-server/index';
 import {MyAppDelegate} from './appDelegate';
 import {CustomDataStore} from './custom-data-store';
 import {CustomModelsDatastore} from './custom-model-data-store';
